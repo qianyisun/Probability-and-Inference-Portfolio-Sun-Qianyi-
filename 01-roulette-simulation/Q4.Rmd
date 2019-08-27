@@ -1,0 +1,17 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+
+
+
+
+Q4:Be sure to explain the limitations of the simulation; identify simplifications or other sources of uncertainty.
+
+#answer:limitations of the simulation:(1)When the number of gamblers rises above 10,000 times, the computer is running too long. (2) 	When Starting budget(B) is closer to Winnings threshold for stopping(W), the gamblers is easier to win money at the end of game.   
+#identify simplifications:(1) Gamblers must bet until they meet stopping conditions and cannot quit the game on their own initiative. At the same time, casinos can't ignore the stopping rules and interrupt the game.
+
