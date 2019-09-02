@@ -1,0 +1,142 @@
+---
+title: "Probability"
+output: html_notebook
+---
+
+##Blog post
+
+1.Explain why the concept is important
+2.Introduce key vocabulary terms, and
+3.Demonstrate the concept in action
+
+First of all, the absolute error is defined as a value which represents that the difference module between the exact value and its simulation value. When the absolute error is larger,the simulation value is more unreliable. Thus during our daily life, we should try our best to avoid the situation that the absolute error is too large to be trusted.The relative error refers to the absolute error of the measurement divided by the exact value. The relative error can be used to evaluate the difference situation between  the exact value and the simulation value in the same way. In general, the absolute value and the relative value is more approaching to zero which represents that the simulation value is closer to the exact value.
+
+By the figures based on the code simulation, we can know that when replicate number of the simulation is higher, the simulation value is closer to the exact value no matter what p's value (p denotes the true underlying probability). The replicate number of the simulation is closer to 2^15, the absolute error and the relative error is basically equel to zero. Thus in this way the absolute error and the relative error nearly can be ignored. It is believed that the specific verification process can be shown in the following code.
+
+
+
+
+
+
+```{r}
+#Q1
+absolute_error_matrix<-matrix(data<-NA,nrow=5,ncol=14)
+p_simulation<- rep(NA, 14)
+absolute_error<-rep(NA, 14)
+n<-rep(NA, 14)
+p<-c(0.01,0.05, 0.10, 0.25, 0.50)
+for (i in 1:5) {
+  
+for (j in 2:15){
+
+absolute_error[j-1]<-mean(abs(rbinom(10000,2^j,p[i])/(2^j)-p[i])) 
+
+absolute_error_matrix[i,j-1]<-absolute_error[j-1]
+
+}
+
+}
+
+ae1<-absolute_error_matrix[1,]
+ae2<-absolute_error_matrix[2,]
+ae3<-absolute_error_matrix[3,]
+ae4<-absolute_error_matrix[4,]
+ae5<-absolute_error_matrix[5,]
+
+
+plot(ae1,type="b",xlim=c(0,15),ylim=c(0,0.2), xlab="N(log2 scale)",ylab="Absolute Error",xaxt="n")
+lines(ae2,type="b",xlim=c(0,15),col="red",ylim=c(0,0.2)) 
+lines(ae3,type="b",xlim=c(0,15),col="green",ylim=c(0,0.2))
+lines(ae4,type="b",xlim=c(0,15),col="blue",ylim=c(0,0.2))
+lines(ae5,type="b",xlim=c(0,15),col="orange",ylim=c(0,0.2))
+axis(1,at=1:14,labels=c("4","8","16","32","64","128","256","512","1024","2048","4096","8192","16384","32768"),cex.axis=0.6)
+text(2.4,0.2,"p=0.50",2,col="orange")
+text(2.4,0.17,"p=0.25",2,col="blue")
+text(2.4,0.14,"p=0.10",2,col="green")
+text(2.4,0.09,"p=0.05",2,col="red")
+text(2.4,0.03,"p=0.01",2,col="black")
+
+```
+```{r}
+#Q2
+relative_error_matrix<-matrix(data<-NA,nrow=5,ncol=14)
+for (i in 1:5){
+  
+relative_error_matrix[i,]<-absolute_error_matrix[i,]/p[i]
+
+}
+
+re1<-relative_error_matrix[1,]
+re2<-relative_error_matrix[2,]
+re3<-relative_error_matrix[3,]
+re4<-relative_error_matrix[4,]
+re5<-relative_error_matrix[5,]
+
+plot(re1,type="b",xlim=c(0,15),ylim=c(0,2), xaxt="n",xlab="N(log2 scale)",ylab="Relative Error")
+lines(re2,type="b",xlim=c(0,15),col="red",ylim=c(0,2)) 
+lines(re3,type="b",xlim=c(0,15),col="green",ylim=c(0,2))
+lines(re4,type="b",xlim=c(0,15),col="blue",ylim=c(0,2))
+lines(re5,type="b",xlim=c(0,15),col="orange",ylim=c(0,2))
+axis(1,at=1:14,labels=c("4","8","16","32","64","128","256","512","1024","2048","4096","8192","16384","32768"),cex.axis=0.6)
+
+text(2.4,2.0,"p=0.01",2,col="black")
+text(2.4,1.7,"p=0.05",2,col="red")
+text(2.4,1.4,"p=0.10",2,col="green")
+text(2.4,0.7,"p=0.25",2,col="blue")
+text(2.4,0.5,"p=0.50",2,col="orange")
+```
+
+
+```{r}
+#Q3
+absolute_error_matrix_log10_scale <- log10(absolute_error_matrix)
+ae1_log10_scale<-absolute_error_matrix_log10_scale[1,]
+ae2_log10_scale<-absolute_error_matrix_log10_scale[2,]
+ae3_log10_scale<-absolute_error_matrix_log10_scale[3,]
+ae4_log10_scale<-absolute_error_matrix_log10_scale[4,]
+ae5_log10_scale<-absolute_error_matrix_log10_scale[5,]
+
+plot(ae1_log10_scale,type="b",xlim=c(0,15),ylim=c(-3.5,-0.5), xlab="N(log2 scale)",ylab="Absolute Error_log10_scale",xaxt="n")
+lines(ae2_log10_scale,xlim=c(0,15),type="b",col="red",ylim=c(-3.5,-0.5)) 
+lines(ae3_log10_scale,xlim=c(0,15),type="b",col="green",ylim=c(-3.5,-0.5))
+lines(ae4_log10_scale,xlim=c(0,15),type="b",col="blue",ylim=c(-3.5,-0.5))
+lines(ae5_log10_scale,xlim=c(0,15),type="b",col="orange",ylim=c(-3.5,-0.5))
+axis(1,at=1:14,labels=c("4","8","16","32","64","128","256","512","1024","2048","4096","8192","16384","32768"),cex.axis=0.60)
+
+text(2.3,-0.6,"p=0.50",2,col="orange")
+text(2.3,-0.8,"p=0.25",2,col="blue")
+text(2.3,-0.95,"p=0.10",2,col="green")
+text(2.3,-1.1,"p=0.05",2,col="red")
+text(2.3,-1.6,"p=0.01",2,col="black")
+```
+
+
+```{r}
+#Q4
+
+  
+relative_error_matrix_log10_scale<-log10(relative_error_matrix)
+
+
+re1_log10_scale<-relative_error_matrix_log10_scale[1,]
+re2_log10_scale<-relative_error_matrix_log10_scale[2,]
+re3_log10_scale<-relative_error_matrix_log10_scale[3,]
+re4_log10_scale<-relative_error_matrix_log10_scale[4,]
+re5_log10_scale<-relative_error_matrix_log10_scale[5,]
+
+plot(re1_log10_scale,type="b",xlim=c(0,15),ylim=c(-3,0.5), xaxt="n",xlab="N(log2 scale)",ylab="Relative Error_log10_scale")
+lines(re2_log10_scale,xlim=c(0,15),type="b",col="red",ylim=c(-3,0.5)) 
+lines(re3_log10_scale,xlim=c(0,15),type="b",col="green",ylim=c(-3,0.5))
+lines(re4_log10_scale,xlim=c(0,15),type="b",col="blue",ylim=c(-3,0.5))
+lines(re5_log10_scale,xlim=c(0,15),type="b",col="orange",ylim=c(-3,0.5))
+axis(1,at=1:14,labels=c("4","8","16","32","64","128","256","512","1024","2048","4096","8192","16384","32768"),cex.axis=0.60)
+
+text(2.3,0.45,"p=0.01",2,col="black")
+text(2.3,0.25,"p=0.05",2,col="red")
+text(2.3,0.08,"p=0.10",2,col="green")
+text(2.3,-0.15,"p=0.25",2,col="blue")
+text(2.3,-0.40,"p=0.50",2,col="orange")
+```
+
+
+
