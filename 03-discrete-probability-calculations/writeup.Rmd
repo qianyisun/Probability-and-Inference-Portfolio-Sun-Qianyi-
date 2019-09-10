@@ -1,0 +1,168 @@
+---
+title: "Analyzing how often the better team win the World Series"
+author: "Qianyi Sun"
+output: 
+  html_notebook:
+    theme: united
+    highlight: tango
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+---
+
+
+
+<center> ![](picture1.png){width=400px}  </center>
+
+
+#  Introduction
+
+The world series is a best-of-7 match-up between the champions of the American and National Leagues of Major League Baseball. The basic rule for the world series is when one team first win 4 times, that team will win the world series. Based on the game rules, what we should do is to calculate and analyze the probability of the Braves win the World Series in different situations.
+
+Before we further discussed the probability of the Braves win the World Series in different situations, we should previously understand the concept of conditional probability and Bayes Rule. This is because this blog concludes some functions which are using conditional probability and Bayes Rule.Conditional probability refers to the occurrence probability of event A under the condition that another event B has already occurred. For Bayes Rule, The probability of event A under the condition of event B is different from that of event B under the condition of event A. However, there is a definite relationship between the two, which is the statement of this relationship.In order to better illustrate them, this blog will discusse them in specific questions
+
+# Notations
+
+ ![](picture2.png){width=600px}
+
+# Solutions to questions
+
+## Question 1
+The following code chunk is to solve the probability that the Braves win the World Series given that PB=0.55. The reult is 0.6082878.
+
+```{r echo=TRUE}
+p1<-0.55
+
+x1<-dbinom(4,4,0.55)
+x2<-dbinom(3,4,0.55)*p1
+x3<-dbinom(3,5,0.55)*p1
+x4<-dbinom(3,6,0.55)*p1
+
+Braves_win1<-x1+x2+x3+x4
+Braves_win1
+
+```
+
+## Question 2
+
+The following code chunk is to solve the situation that when PB is unknown, what the probability that the Braves win the World Series has. 
+
+
+```{r echo=TRUE}
+
+p2<-seq(0.45,1,by=0.01)
+
+x1<-dbinom(4,4,p2)
+x2<-dbinom(3,4,p2)*p2
+x3<-dbinom(3,5,p2)*p2
+x4<-dbinom(3,6,p2)*p2
+
+Braves_win2<-x1+x2+x3+x4
+
+plot(x=p2,y=Braves_win2,xlab="Probability of the Braves winning a head-to-head matchup",ylab="P(Win World Series)",main="Probability of winning the World Series",ylim=c(0,1),xlim=c(0.47,1.03))
+
+```
+### Figure analysis for question 2
+
+By calculating P(Win World Series), P(Win World Series) increases with increasing Probability of the Braves winning a head-to-head matchup.And when Probability of the Braves winning a head-to-head matchup is closer to 1.0,P(Win World Series)'s rate of growth slowed down but it is nearly approaching to 1.0. The graph's function change is reasonable.  Therefore, we can use this figure to the change of  P(Braves win World Series)  over time.
+
+## Question 3
+
+The following code chunk is to solve what the shortest series length is when  the World Series has  best-of-X series and P(Braves win World Series|PB=0.55)≥0.8. It seems a confusing problem. Because it is very diffcuilt for us to list all possibility of best-of-X series and get the shortest series length. But by computer simulation, we can see that the shortest series length is 71.
+
+```{r echo=TRUE}
+
+p3<-0.55
+
+Braves_win3<-function(p3){
+  for(i in 1:1000)
+  {
+    N=i
+    p_Braves_win3<-pnbinom((N-1)/2,(N+1)/2,p3)
+    if (p_Braves_win3 >= 0.8)
+  {
+    return (N)
+    break
+  }
+  }
+  
+}
+Braves_win3(p3)
+
+```
+
+
+## Question 4
+
+The following code chunk is to solve What the shortest series length so that P(Braves win World Series|PB=x)≥0.8 is. Because x is unknown. Thus, to better show the results, I put PB on the x-axis and series length on the y-axis to draw a figure.
+
+```{r echo=TRUE}
+pr <- rep(NA, 50)
+Braves_win3<-function(p3){
+  for(i in 1:10000)
+  {
+    N=i
+    p_Braves_win3<-pnbinom((N-1)/2,(N+1)/2,p3)
+    if (p_Braves_win3 >= 0.8)
+  {
+    return (N)
+    break
+  }
+  }
+  
+}
+
+p4<-0.50
+for (i in 1:50){
+  p_braves_win4<-p4+i*0.01
+  
+    pr[i]=Braves_win3(p_braves_win4)
+  
+}
+p_braves_win4_total<-seq(0.51,1,by=0.01)
+
+plot(x=p_braves_win4_total,y=pr,xlim=c(0.47,1.03),xlab="Probability of the Braves winning a head-to-head matchup",ylab="Series length",type="l",main="Shortest series so that P(Win MS given p)>=0.8")
+```
+
+### Figure analysis for question 4
+
+As the figure shows, the series length is progressly down with the incresing PB. Therefore it is easy for me to conlude that Series length and PB has negative relation. When PB is between 0.5 and 0.6, Series length is quickly declining. However, when PB is more than 0.6, the decrease rate of Series length is becoming smaller.
+
+## Question 5
+
+### Theory proof
+
+$P(P_B=0.55│Braves \,win\, World \,Series \,in\, 7 \,games)=\frac{P(P_B=0.55 \,and \,Braves \,win\, World Series\, in\, 7 games \,)}{P(Braves\, win\, World\, Series\, in\, 7 \,games)}$
+
+$=\frac{P(P_B=0.55)*P(Braves\, win\, World \,Series\, in\, 7\, games\,| \,P_B=0.55)}{(P_B=0.55)*P(Braves\, win\, World\, Series\, in\, 7 \,games\,| \,P_B=0.55)+(P_B=0.45)*P(Braves\, win\, World \,Series\, in \,7\, game\,| \,P_B=0.45)}$
+
+$=\frac{P(P_B=0.55)*dnbinom(3,4,0.55)}{P(P_B=0.55)*dnbinom(3,4,0.55)+P(P_B=0.45)*dnbinom(3,4,0.45)}$
+
+$=\frac{P(P_B=0.55)}{P(P_B=0.55)+P(P_B=0.45)}$
+
+### Code solution for question 5
+
+The folloing mathmatical functions and chunk codes are to understant how to calculate P(PB=0.55|Braves win World Series in 7 games) under the assumption that either PB=0.55 or PB=0.45. 
+
+
+
+```{r echo=TRUE}
+p_0.55<-seq(0.00,1,by=0.01)
+p_0.45<-1-p_0.55
+p<-(p_0.55*dnbinom(3,4,0.55))/(p_0.55*dnbinom(3,4,0.55)+(1-p_0.55)*dnbinom(3,4,0.45))
+
+
+plot(x=p_0.55,y=p,xlab="Probability of PB=0.55",ylab="P(PB=0.55|Braves win World Series in 7 games)")
+```
+### Figure analysis for question 5
+
+When the probability of PB=0.55 is equel to the probability of PB=0.45, the P(PB=0.55|Braves win World Series in 7 games)=0.55. Except that, P(PB=0.55|Braves win World Series in 7 games) and the probability of PB=0.55 are nearly linear relation.
+
+
+# Conclusion
+In a word, by analyzing the probability of the Braves win the World Series in different situations, I can know about how the probability of a team win the World Series operates. It is very interesting and it worths deeply discussing. It is easy to see that Probability of the Braves winning a head-to-head matchup and P(Win World Series) is positive relation. But the Series length and PB has negative relation. At the same time, P(PB=0.55|Braves win World Series in 7 games) and the probability of PB=0.55 are nearly linear relation.
+
+
+
