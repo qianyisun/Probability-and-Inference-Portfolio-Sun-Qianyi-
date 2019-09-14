@@ -1,12 +1,25 @@
 ---
-title: "Probability"
-output: html_notebook
+title: "Analyzing simulation error"
+author: "Qianyi Sun"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+  html_notebook:
+    code_folding: hide
+    highlight: tango
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
-##Blog post
+#  Introduction
 
 1.Explain why the concept is important
-2.Introduce key vocabulary terms, and
+2.Introduce key vocabulary terms
 3.Demonstrate the concept in action
 
 First of all, the absolute error is defined as a value which represents that the difference module between the exact value and its simulation value. When the absolute error is larger,the simulation value is more unreliable. Thus during our daily life, we should try our best to avoid the situation that the absolute error is too large to be trusted.The relative error refers to the absolute error of the measurement divided by the exact value. The relative error can be used to evaluate the difference situation between  the exact value and the simulation value in the same way. In general, the absolute value and the relative value is more approaching to zero which represents that the simulation value is closer to the exact value.
@@ -15,11 +28,12 @@ By the figures based on the code simulation, we can know that when replicate num
 
 
 
+# Solutions to questions
 
-
+## Question 1
 
 ```{r}
-#Q1
+
 absolute_error_matrix<-matrix(data<-NA,nrow=5,ncol=14)
 p_simulation<- rep(NA, 14)
 absolute_error<-rep(NA, 14)
@@ -36,6 +50,7 @@ absolute_error_matrix[i,j-1]<-absolute_error[j-1]
 }
 
 }
+
 
 ae1<-absolute_error_matrix[1,]
 ae2<-absolute_error_matrix[2,]
@@ -55,10 +70,14 @@ text(2.4,0.17,"p=0.25",2,col="blue")
 text(2.4,0.14,"p=0.10",2,col="green")
 text(2.4,0.09,"p=0.05",2,col="red")
 text(2.4,0.03,"p=0.01",2,col="black")
-
 ```
+
+### Figure analysis for question 1
+When the N(log2 scale) is between 4 and 64, for the p=0.5, p=0.25,p=0.10 and p=0.05, their absolute error's values all decline very quickly. On the contrary, for p=0.01, its original absolute error's value is very small. Thus its decline trend is not that distinct.
+
+
+## Question 2
 ```{r}
-#Q2
 relative_error_matrix<-matrix(data<-NA,nrow=5,ncol=14)
 for (i in 1:5){
   
@@ -85,10 +104,12 @@ text(2.4,1.4,"p=0.10",2,col="green")
 text(2.4,0.7,"p=0.25",2,col="blue")
 text(2.4,0.5,"p=0.50",2,col="orange")
 ```
+### Figure analysis for question 2
+As the graph shows, when values of p is larger, the relative error is faster to decline. But with the N(log2 scale) is higher, relative errors are approaching 0.
 
 
+## Question 3
 ```{r}
-#Q3
 absolute_error_matrix_log10_scale <- log10(absolute_error_matrix)
 ae1_log10_scale<-absolute_error_matrix_log10_scale[1,]
 ae2_log10_scale<-absolute_error_matrix_log10_scale[2,]
@@ -96,7 +117,7 @@ ae3_log10_scale<-absolute_error_matrix_log10_scale[3,]
 ae4_log10_scale<-absolute_error_matrix_log10_scale[4,]
 ae5_log10_scale<-absolute_error_matrix_log10_scale[5,]
 
-plot(ae1_log10_scale,type="b",xlim=c(0,15),ylim=c(-3.5,-0.5), xlab="N(log2 scale)",ylab="Absolute Error_log10_scale",xaxt="n")
+plot(ae1_log10_scale,type="b",xlim=c(0,15),ylim=c(-3.5,-0.5), xlab="N(log2 scale)",ylab="Absolute Error log10 scale",xaxt="n")
 lines(ae2_log10_scale,xlim=c(0,15),type="b",col="red",ylim=c(-3.5,-0.5)) 
 lines(ae3_log10_scale,xlim=c(0,15),type="b",col="green",ylim=c(-3.5,-0.5))
 lines(ae4_log10_scale,xlim=c(0,15),type="b",col="blue",ylim=c(-3.5,-0.5))
@@ -109,12 +130,12 @@ text(2.3,-0.95,"p=0.10",2,col="green")
 text(2.3,-1.1,"p=0.05",2,col="red")
 text(2.3,-1.6,"p=0.01",2,col="black")
 ```
+### Figure analysis for question 3
+The value of p is higher, the absolute error is higher. This attribute is just opposite to the relative error's attribute. At the same time, the five lines on the graph seemingly are parallel.
 
+## Question 4
 
 ```{r}
-#Q4
-
-  
 relative_error_matrix_log10_scale<-log10(relative_error_matrix)
 
 
@@ -124,7 +145,7 @@ re3_log10_scale<-relative_error_matrix_log10_scale[3,]
 re4_log10_scale<-relative_error_matrix_log10_scale[4,]
 re5_log10_scale<-relative_error_matrix_log10_scale[5,]
 
-plot(re1_log10_scale,type="b",xlim=c(0,15),ylim=c(-3,0.5), xaxt="n",xlab="N(log2 scale)",ylab="Relative Error_log10_scale")
+plot(re1_log10_scale,type="b",xlim=c(0,15),ylim=c(-3,0.5), xaxt="n",xlab="N(log2 scale)",ylab="Relative Error log10 scale")
 lines(re2_log10_scale,xlim=c(0,15),type="b",col="red",ylim=c(-3,0.5)) 
 lines(re3_log10_scale,xlim=c(0,15),type="b",col="green",ylim=c(-3,0.5))
 lines(re4_log10_scale,xlim=c(0,15),type="b",col="blue",ylim=c(-3,0.5))
@@ -137,6 +158,9 @@ text(2.3,0.08,"p=0.10",2,col="green")
 text(2.3,-0.15,"p=0.25",2,col="blue")
 text(2.3,-0.40,"p=0.50",2,col="orange")
 ```
+### Figure analysis for question 4
+The value of p is higher, the relative error is small. At the same time, the five lines on the graph seemingly are parallel.
 
 
-
+# Conclusion
+From the four graphs, we can see that the absolute error and the relative error have a negative relation. And for log 10 output, the graphs of the absolute error and  relative error shows that their own five lines are parallel. Moreover, the log 10 output's absolute errors are all negative number. When the 10 output's N(log2 scale) are more than 256, the five relative error's value are smaller than 0 and shows a parallel trend.

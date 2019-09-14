@@ -1,17 +1,30 @@
 ---
-title: "R Notebook"
+title: "Analyzing roulette strategies"
+author: "Qianyi Sun"
 output:
+  html_notebook:
+    code_folding: hide
+    highlight: tango
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
   html_document:
     df_print: paged
+    toc: yes
+    toc_depth: '4'
 ---
 
-##Blog post
-1.Intruduction to Roulette strategies.
+#  Introduction
 
 A roulette table composed of 38 (or 37) evenly sized pockets on a wheel. The pockets are colored red, black, or green. The pockets are also numbered. Roulette is a game of chance in which a pocket is randomly selected. Gamblers may wager on several aspects of the outcome. For example, one may place a wager that the randomly selected pocket will be red or odd numbered or will be a specific number.
 
 For this game, all one needs to know is that there are 38 pockets of which 2 are green, 18 are red, and 18 are black. The payout for a bet on black (or red) is $1 for each $1 wagered. This means that if a gambler bets $1 on black and the randomly selected pocket is black, then the gambler will get the original $1 wager and an additional $1 as winnings.(quoted from https://github.com/thomasgstewart/data-science-5620/blob/master/deliverables/01-roulette.md)
 
+# Solutions to questions
+
+## Question 1
 Q1:You should explain how you used computer simulation to calculate the average earnings of a gambler that uses this strategy. As part of the explanation, provide a figure (or a series of figures) that show how the gamblers earnings (or losses) evolve over a series of wagers at the roulette wheel. (The x-axis will be the wager number (or play number), the y-axis will be earnings.) The code below provides all the functions you’ll need to calculate average earnings.
 
 For Q1, first of all, to solve this question, we need to find the relative variables to create a figure to observe how gambler earnings evolve a series of wagers at the roulette wheel.Thus, we at least must know how to attain x-axis and y-axis. By reading question, we can see that x-axis is wager number and y-axis is earnings. Then for wager number, how can we get it? In order to get wager number, we should understand one_series() function. Within the one_series code, it set initial state like B number which is the starting budget and W number which is the budget threshold for successfully stoping. And it opens the vector to store budget over series of plays and create loop of plays. Thus in a word, one_series() is to set basic game rule and has contained the every change of budget's values. So when we get the every change of budget's values, we can Subtract it from the starting budget to get the change of gambler earning's value.
@@ -103,7 +116,7 @@ get_last <- function(x) x[length(x)]
 
 
 # Simulation
-walk_out_money <- rep(NA, 1000)
+walk_out_money <- rep(NA, 10000)
 for(j in seq_along(walk_out_money)){
   walk_out_money[j] <- one_series(B = 200, W = 300, L = 1000, M = 100) %>% get_last
 }
@@ -117,20 +130,19 @@ mean(walk_out_money > 200)
 # Estimated earnings
 mean(walk_out_money - 200)
 ```
-
 ```{r}
 earnings <- one_series(B = 200, W = 300, L = 1000, M = 100) - 200
 
-#plot(x = wager_number, y = earnings, type = "l")
-plot(earnings,type="l")
-```
 
+plot(earnings,type="l",xlab="wager number")
+```
+## Question 2
 
 Q2:Show your audience how changing a parameter of the simulation (see table below) does or does not have an impact on average earnings. A figure would be helpful.
 
 For Q2, we can see that there are four parameters we can change. The four parameters are B, W, L and M. But these parameters are mutual restrains. For example, B is less than W. I set B=b. The value of b is from 201 to 300. we set walk_out_money as y-axis. walk_out_money means that when a gambler stops the game, how much money he or she has. And we set xb as x-axis. The values of xb is from 201 to 300. Then we use plot() to draw a figure. By analyzing the result from first chunk code, we can know that the starting budget(B)  and walk_out_money has positive correlation. At the same time, we can indirectly find that the probability of winning is higher when the starting budget(B) is closer to the budget threshold for successfully stoping(W). In the same way, we change the budget threshold for successfully stoping(W) in the second chunk code. From the figure, we can find that the budget threshold for successfully stoping and walk_out_money has negative correlation. And By changing the maximum number of plays(L) and the casino wager limit(M), we can find that L and M has no distinct correlation.
 
-
+### changing B value
 ```{r}
 
 #' A single play of the Martingale strategy
@@ -233,7 +245,7 @@ store_outmoney <- rep(NA, 100)
 for(i in 1:100){
 b=i+200 # set a oringinal value of Starting budget
 
-walk_out_money <- rep(NA, 100)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
+walk_out_money <- rep(NA, 1000)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
 for(j in seq_along(walk_out_money)){
   walk_out_money[j] <- one_series(B = b, W = 300, L = 1000, M = 100) %>% get_last#get_last is function(x) x[length(x)] 's value of last one
 
@@ -242,20 +254,18 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 
 
 
-# Walk out money distribution
-#hist(walk_out_money, breaks = 100)
-
-# Estimated probability of walking out with extra cash
-#mean(walk_out_money > 200)
 
 # Estimated earnings
 y=mean(walk_out_money - 200)
 }
 xb<- 201:300 # original budget is from 201 to 300.
-plot(x=xb,y=store_outmoney,type="l")#draw a line chart
-
-# when walk_out_money<-rep(NA,X), X is growing. Then the plot will show xb and store_outmoney has positive relation.
+plot(x=xb,y=store_outmoney,type="l",xlab="Starting budget") #draw a line chart
 ```
+#### Figure analysis for changing B value
+When X within walk_out_money<-rep(NA,X) is growing, then the plot will show Starting budget and store_outmoney has positive relation.
+
+### changing W value
+
 
 ```{r}
 #' A single play of the Martingale strategy
@@ -358,7 +368,7 @@ store_outmoney <- rep(NA, 100)
 for(i in 1:100){
 w=i+200 # set a oringinal value of Starting budget
 
-walk_out_money <- rep(NA, 100)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
+walk_out_money <- rep(NA, 1000)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
 for(j in seq_along(walk_out_money)){
   walk_out_money[j] <- one_series(B = 200, W = w, L = 1000, M = 100) %>% get_last#get_last is function(x) x[length(x)] 's value of last one
 
@@ -367,22 +377,18 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 
 
 
-# Walk out money distribution
-#hist(walk_out_money, breaks = 100)
 
-# Estimated probability of walking out with extra cash
-#mean(walk_out_money > 200)
 
 # Estimated earnings
 y=mean(walk_out_money - 200)
 }
 xw<- 201:300 # the budget threshold for successfully stoping is from 201 to 300.
-plot(x=xw,y=store_outmoney,type="l")#draw a line chart
-
-# when walk_out_money<-rep(NA,X), X is growing. Then the plot will show xb and store_outmoney has positive relation.
+plot(x=xw,y=store_outmoney,type="l",xlab="the budget threshold for successfully stoping")#draw a line chart
 ```
+#### Figure analysis for changing W value
+Then the plot will show the budget threshold for successfully stoping and store_outmoney has negative relation.
 
-
+### changing L value
 
 ```{r}
 #' A single play of the Martingale strategy
@@ -485,7 +491,7 @@ store_outmoney <- rep(NA, 100)
 for(i in 1:100){
 l=i+900 # set a oringinal value of Starting budget
 
-walk_out_money <- rep(NA, 100)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
+walk_out_money <- rep(NA, 1000)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
 for(j in seq_along(walk_out_money)){
   walk_out_money[j] <- one_series(B = 200, W = 300, L = l, M = 100) %>% get_last#get_last is function(x) x[length(x)] 's value of last one
 
@@ -494,20 +500,19 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 
 
 
-# Walk out money distribution
-#hist(walk_out_money, breaks = 100)
 
-# Estimated probability of walking out with extra cash
-#mean(walk_out_money > 200)
 
 # Estimated earnings
 y=mean(walk_out_money - 200)
 }
 xl<- 901:1000 # the maximum number of plays is from 901 to 1000.
-plot(x=xl,y=store_outmoney,type="l")#draw a line chart
-
-# when walk_out_money<-rep(NA,X), X is growing. Then the plot will show xb and store_outmoney has positive relation.
+plot(x=xl,y=store_outmoney,type="l",xlab="the maximum number of plays")#draw a line chart
 ```
+#### Figure analysis for changing L value
+The maximum number of plays and store_outmoney do not have distinct relation.
+
+
+### changing M value
 
 ```{r}
 
@@ -611,7 +616,7 @@ store_outmoney <- rep(NA, 100)
 for(i in 1:100){
 m=i+50 # set a oringinal value of Starting budget
 
-walk_out_money <- rep(NA, 100)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
+walk_out_money <- rep(NA, 1000)#when walking out, person has the money ///if we want to run a plot quickly, we should set with rep()'s time is smaller interger
 for(j in seq_along(walk_out_money)){
   walk_out_money[j] <- one_series(B = 200, W = 300, L = 1000, M = m) %>% get_last#get_last is function(x) x[length(x)] 's value of last one
 
@@ -620,20 +625,18 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 
 
 
-# Walk out money distribution
-#hist(walk_out_money, breaks = 100)
 
-# Estimated probability of walking out with extra cash
-#mean(walk_out_money > 200)
 
 # Estimated earnings
 y=mean(walk_out_money - 200)
 }
 xm<- 51:150 # number, the casino wager limit is from 51 to 150.
-plot(x=xm,y=store_outmoney,type="l")#draw a line chart
-
+plot(x=xm,y=store_outmoney,type="l",xlab="the casino wager limit")#draw a line chart
 ```
+#### Figure analysis for changing M value
+The casino wager limit and store_outmoney do not have distinct relation.
 
+## Question 3
 
 Q3:See the stopping rule below. Explain to your audience how you used computer simulation to estimate the average number of plays before stopping. The code below will need to be modified to calculate this quantity.
 
@@ -648,9 +651,10 @@ for(j in seq_along(play_number)){
 mean(play_number)
 ```
 
+## Question 4
 
 Q4:Be sure to explain the limitations of the simulation; identify simplifications or other sources of uncertainty.
 
-#answer:limitations of the simulation:(1)When the number of gamblers rises above 10,000 times, the computer is running too long. (2) 	When Starting budget(B) is closer to Winnings threshold for stopping(W), the gamblers is easier to win money at the end of game.   
-#identify simplifications:(1) Gamblers must bet until they meet stopping conditions and cannot quit the game on their own initiative. At the same time, casinos can't ignore the stopping rules and interrupt the game.
+Answer:limitations of the simulation:(1)When the number of gamblers rises above 10,000 times, the computer is running too long. (2) 	When Starting budget(B) is closer to Winnings threshold for stopping(W), the gamblers is easier to win money at the end of game.   
+Identifing simplifications:(1) Gamblers must bet until they meet stopping conditions and cannot quit the game on their own initiative. At the same time, casinos can't ignore the stopping rules and interrupt the game.
 
