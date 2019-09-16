@@ -106,7 +106,7 @@ for(i in 1:nrow(apo)){
 # Probability of overall World Series outcomes
 apo[, sum(p), overall_outcome]
 ```
-Answer: The difference in probabilites (with vs without home field advantage) does depend on the advantage factor. The conclusion comes from the answer of question 1. Through comparing with home field advantage result with without home field advantage result, the first result's probability of overall World Series outcomes that Braves can win is 0.604221. Otherwise, the second's probability of overall World Series outcomes that Braves can win is 0.6082878. The two values are different.
+Answer: The difference in probabilites (with vs without home field advantage) does depend on the advantage factor. The conclusion comes from the answer of question 1. Through comparing with home field advantage result with without home field advantage result, the first result's probability of overall World Series outcomes that Braves can win is 0.604221. Otherwise, the second's probability of overall World Series outcomes that Braves can win is 0.6082878. The two values are different. The difference in probabilities is 0.0040668.
 
 ## Question 2
 
