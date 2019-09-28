@@ -1,19 +1,16 @@
 ---
 title: "Analyzing world series home field"
 author: "Qianyi Sun"
-output:
-  html_notebook:
-    code_folding: hide
-    highlight: tango
-    number_sections: yes
-    theme: united
-    toc: yes
-    toc_depth: 3
-    toc_float: yes
+output: 
   html_document:
-    df_print: paged
-    toc: yes
-    toc_depth: '3'
+    theme: united
+    #highlight: zenburn
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    #number_sections: true
+    fig_caption: true
 ---
 
 #  Introduction
@@ -33,7 +30,7 @@ The World Series is a first-to-4-wins match-up between the champions of the Amer
 The following code chunk is to solve the probability that the Braves win the world series when the sequence of game locations is {NYC, NYC, ATL, ATL, ATL, NYC, NYC}. As the question shows, when Braves are in their own stadium or not, their the probability of winning the world series. By the chunk below, we need to discovery  the situation that what probability of winning is.
 
 
-```{r}
+```{r message=FALSE }
 #Q1_with_homeadvantage
 require(dplyr)
 require(data.table)
@@ -70,7 +67,7 @@ for(i in 1:nrow(apo)){
 # Probability of overall World Series outcomes
 apo[, sum(p), overall_outcome]
 ```
-```{r}
+```{r }
 #Q1_without_homeadvantage
 require(dplyr)
 require(data.table)
@@ -106,13 +103,13 @@ for(i in 1:nrow(apo)){
 # Probability of overall World Series outcomes
 apo[, sum(p), overall_outcome]
 ```
-Answer: The difference in probabilites (with vs without home field advantage) does depend on the advantage factor. The conclusion comes from the answer of question 1. Through comparing with home field advantage result with without home field advantage result, the first result's probability of overall World Series outcomes that Braves can win is 0.604221. Otherwise, the second's probability of overall World Series outcomes that Braves can win is 0.6082878. The two values are different. The difference in probabilities is 0.0040668.
+Answer: The difference in probabilites (with vs without home field advantage) does depend on the advantage factor. The conclusion comes from the answer of question 1. Through comparing with home field advantage result with without home field advantage result, the first result's probability of overall World Series outcomes that Braves can win is 0.604221. Otherwise, the second's probability of overall World Series outcomes with home filed advantage that Braves can win is 0.6082878. The two values are different. The difference in probabilities is 0.0040668.
 
 ## Question 2
 
 For real situation, the probability that Braves win is nearly not possible to be constantly equal to 0.55. Thus we use Binomial Distribution to produce the probability that Braves win in computer.
 
-```{r}
+```{r message=FALSE }
 #Q2_with_homeadvantage
 
 require(dplyr)
@@ -151,7 +148,7 @@ for(i in 1:nrow(apo)){
 apo[, sum(p), overall_outcome]
 ```
 
-```{r}
+```{r message=FALSE}
 #Q2_without_homeadvantage
 require(dplyr)
 require(data.table)
@@ -190,10 +187,10 @@ apo[, sum(p), overall_outcome]
 The stadium's probability of overall World Series outcomes that Braves can win is 0.6039864. Otherwise, the without home field' probability of overall World Series outcomes that Braves can win is 0.6088088.From computer simulation, we see that the values of simulation are basically equel to the corresponding probability.
 
 ## Question 3
-From question 1 and question 2, we can know that the probabilities of Braves win are basically equal no matter whether you have a home advantage or not. But is it ture? In order to solve this worry. We introduced the relative error and absolute error. By calculating, the the absolute and relative error for your simulation in the previous question are 0.0001244 and 0.0005190909 respectively.
+From question 1 and question 2, we can know that the probabilities of Braves win are basically equal no matter whether you have a home advantage or not. But is it ture? In order to solve this worry. We introduced the relative error and absolute error. 
 
-```{r}
-#Q3
+```{r message=FALSE}
+
 p_win3<-0.55
 absolute_error_assign4<-abs(p_win3-mean(rbinom(10000,1000,0.55)/1000))
 absolute_error_assign4
@@ -202,9 +199,16 @@ relative_error_assign4<-abs(p_win3-mean(rbinom(10000,1000,0.55)/1000))/p_win3
 relative_error_assign4
 ```
 
+
+With without home field, the the absolute and relative error for my simulation in the previous question are 0.0045878 and 0.0075357 respectively.With home field, the the absolute and relative error for my simulation in the previous question are 0.0001244 and 0.0005190909 respectively.
+
+
+
+
+
 ## Question 4
 Because previous questions all are based on PB=0.55, it lets me consider when PB changes, does it produce difference in probabilites? In this point, we set PB unknown. Then we repeat same calculation process.
-```{r}
+```{r message=FALSE}
 
 #Q4_with_homeadvantage
 require(dplyr)
@@ -290,7 +294,7 @@ pb_vector_without[l]<-d_without[[1,2]]
 ```
 
 
-```{r}
+```{r message=FALSE}
 pb_difference<-rep(NA,100)
 for(i in 1:100){
 pb_difference[i]<-pb_vector[i]-pb_vector_without[i]
@@ -307,7 +311,7 @@ The difference in probability's values are from subtracting the probabilities th
 ## Question 5
 If we change the value of advantage_multiplier, we can find what change of the difference in probabilites is. To discovery this point, we set the difference in probabilites as y label and advantage_multiplier as x label to draw a graph.
 
-```{r}
+```{r message=FALSE}
 #Q5_with_homeadvantage
 require(dplyr)
 require(data.table)
@@ -318,7 +322,7 @@ apo <- fread("all-possible-world-series-outcomes.csv")
 hfi <-  c(0,0,1,1,1,0,0) #{NYC, NYC, ATL, ATL, ATL, NYC, NYC}
 
 # P_B
-advantage_multiplier<-rep(NA,100)
+advantage_multiplier_C<-rep(NA,100)
 pb_vector_5<-rep(NA,100)
 for (l in 1:100){
  advantage_multiplier_C[l]<-1+l*0.01
@@ -355,7 +359,7 @@ pb_vector_5[l]<-d[[1,2]]
 ```
 
 
-```{r}
+```{r message=FALSE}
 #Q5
 pb_difference_5<-rep(NA,100)
 pb_vector_without<-0.6082878
@@ -367,7 +371,7 @@ plot(x=v,y=pb_difference_5,type="l",ylab="The difference in probabilities",xlab=
 ```
 
 ### Figure analysis for question 5
-By observing the graph, I found that with the advantage multiplier growth, the difference in probabilities is becoming more distinct.
+By observing the graph, I found that with the advantage multiplier growth, the difference in probabilities is becoming more distinct. Thus the difference in probabilites does depend on the advantage factor.
 
 # Conclusions
 In a word, when PB is changing, the difference in probabilitiies is also changing. And when PB is 0.5, the difference in probabilities are close to 0. Moreover, by increasing advantage multiplier, it will enlarge the difference in probabilities. Above all, when one team has home field advantage, it does have an impact on helping that team win game.
