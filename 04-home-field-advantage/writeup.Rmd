@@ -13,6 +13,7 @@ output:
     fig_caption: true
 ---
 
+
 #  Introduction
 The World Series is a first-to-4-wins match-up between the champions of the American and National Leagues of Major League Baseball. The home field advantage is when one team has a game in their own home stadium, they can have a higher probability of winning the game.In this blog, we analyze two team whose names are Braves and Yankees. Braves's home stadium is Atlanta and Yankees's home stadium is New York City(NYC = New York City, ATL = Atlanta). 
 
