@@ -1717,8 +1717,8 @@ for(i in 1:nrow(apo)){
 # Probability of overall World Series outcomes
 apo[, sum(p), overall_outcome]</code></pre>
 <pre><code>##    overall_outcome        V1
-## 1:               W 0.6047129
-## 2:               L 0.3952871</code></pre>
+## 1:               W 0.6042195
+## 2:               L 0.3957805</code></pre>
 <pre class="r"><code>#Q2_without_homeadvantage
 require(dplyr)
 require(data.table)
@@ -1754,8 +1754,8 @@ for(i in 1:nrow(apo)){
 # Probability of overall World Series outcomes
 apo[, sum(p), overall_outcome]</code></pre>
 <pre><code>##    overall_outcome        V1
-## 1:               W 0.6086306
-## 2:               L 0.3913694</code></pre>
+## 1:               W 0.6077116
+## 2:               L 0.3922884</code></pre>
 <p>The stadium’s probability of overall World Series outcomes that Braves can win is 0.6039864. Otherwise, the without home field’ probability of overall World Series outcomes that Braves can win is 0.6088088.From computer simulation, we see that the values of simulation are basically equel to the corresponding probability.</p>
 </div>
 <div id="question-3" class="section level2">
@@ -1764,10 +1764,10 @@ apo[, sum(p), overall_outcome]</code></pre>
 <pre class="r"><code>p_win3&lt;-0.55
 absolute_error_assign4&lt;-abs(p_win3-mean(rbinom(10000,1000,0.55)/1000))
 absolute_error_assign4</code></pre>
-<pre><code>## [1] 2.45e-05</code></pre>
+<pre><code>## [1] 0.0002307</code></pre>
 <pre class="r"><code>relative_error_assign4&lt;-abs(p_win3-mean(rbinom(10000,1000,0.55)/1000))/p_win3
 relative_error_assign4</code></pre>
-<pre><code>## [1] 5.472727e-05</code></pre>
+<pre><code>## [1] 1.818182e-07</code></pre>
 <p>With without home field, the the absolute and relative error for my simulation in the previous question are 0.0045878 and 0.0075357 respectively.With home field, the the absolute and relative error for my simulation in the previous question are 0.0001244 and 0.0005190909 respectively.</p>
 </div>
 <div id="question-4" class="section level2">
