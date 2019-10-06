@@ -2,18 +2,14 @@
 title: "Analyzing roulette strategies"
 author: "Qianyi Sun"
 output:
-  html_notebook:
-    code_folding: hide
-    highlight: tango
-    number_sections: yes
-    theme: united
-    toc: yes
-    toc_depth: 4
-    toc_float: yes
   html_document:
-    df_print: paged
+    code_folding: hide
+    theme: cosmo
     toc: yes
-    toc_depth: '4'
+    toc_depth: 5
+    toc_float: true
+editor_options: 
+  chunk_output_type: inline
 ---
 
 #  Introduction
@@ -24,7 +20,7 @@ For this game, all one needs to know is that there are 38 pockets of which 2 are
 
 # Solutions to questions
 
-## Question 1
+## Simulation process of the roulette wheel
 Q1:You should explain how you used computer simulation to calculate the average earnings of a gambler that uses this strategy. As part of the explanation, provide a figure (or a series of figures) that show how the gamblers earnings (or losses) evolve over a series of wagers at the roulette wheel. (The x-axis will be the wager number (or play number), the y-axis will be earnings.) The code below provides all the functions you’ll need to calculate average earnings.
 
 For Q1, first of all, to solve this question, we need to find the relative variables to create a figure to observe how gambler earnings evolve a series of wagers at the roulette wheel.Thus, we at least must know how to attain x-axis and y-axis. By reading question, we can see that x-axis is wager number and y-axis is earnings. Then for wager number, how can we get it? In order to get wager number, we should understand one_series() function. Within the one_series code, it set initial state like B number which is the starting budget and W number which is the budget threshold for successfully stoping. And it opens the vector to store budget over series of plays and create loop of plays. Thus in a word, one_series() is to set basic game rule and has contained the every change of budget's values. So when we get the every change of budget's values, we can Subtract it from the starting budget to get the change of gambler earning's value.
@@ -122,7 +118,7 @@ for(j in seq_along(walk_out_money)){
 }
 
 # Walk out money distribution
-hist(walk_out_money, breaks = 100)
+hist(walk_out_money, breaks = 100,xlab = "Walk Out Money", main = paste("Histogram of", "Walk Out Money"))
 
 # Estimated probability of walking out with extra cash
 mean(walk_out_money > 200)
@@ -134,9 +130,11 @@ mean(walk_out_money - 200)
 earnings <- one_series(B = 200, W = 300, L = 1000, M = 100) - 200
 
 
-plot(earnings,type="l",xlab="wager number")
+plot(earnings,type="l", xlab = "Wager Number", ylab = "Earnings")
 ```
-## Question 2
+From the graph, it shows how the gamblers earnings (or losses) evolve over a series of wagers at the roulette wheel.Every time th gambler wins, the gambler will earns only 1 dollar. But if the gambler losses all the time, the gambler will loss a lot money because the loss is exponentially increased and in the end the gambler will loss all the money he has.
+
+## Changing parameter
 
 Q2:Show your audience how changing a parameter of the simulation (see table below) does or does not have an impact on average earnings. A figure would be helpful.
 
@@ -259,10 +257,10 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 y=mean(walk_out_money - 200)
 }
 xb<- 201:300 # original budget is from 201 to 300.
-plot(x=xb,y=store_outmoney,type="l",xlab="Starting budget") #draw a line chart
+plot(x=xb,y=store_outmoney,type="l",xlab="Starting budget",ylab="Average earnings") #draw a line chart
 ```
 #### Figure analysis for changing B value
-When X within walk_out_money<-rep(NA,X) is growing, then the plot will show Starting budget and store_outmoney has positive relation.
+The graph shows that Starting budget and average earnings has positive relation.
 
 ### changing W value
 
@@ -383,10 +381,10 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 y=mean(walk_out_money - 200)
 }
 xw<- 201:300 # the budget threshold for successfully stoping is from 201 to 300.
-plot(x=xw,y=store_outmoney,type="l",xlab="the budget threshold for successfully stoping")#draw a line chart
+plot(x=xw,y=store_outmoney,type="l",xlab="The budget threshold for successfully stoping", ylab="Average earnings")#draw a line chart
 ```
 #### Figure analysis for changing W value
-Then the plot will show the budget threshold for successfully stoping and store_outmoney has negative relation.
+Then the plot will show the budget threshold for successfully stoping and average earnings has negative relation. It means that when the budget threshold for successfully stoping increases, average earnings have a tendency to decrease.
 
 ### changing L value
 
@@ -506,10 +504,10 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 y=mean(walk_out_money - 200)
 }
 xl<- 901:1000 # the maximum number of plays is from 901 to 1000.
-plot(x=xl,y=store_outmoney,type="l",xlab="the maximum number of plays")#draw a line chart
+plot(x=xl,y=store_outmoney,type="l",xlab="The maximum number of plays", ylab = "Average earnings")#draw a line chart
 ```
 #### Figure analysis for changing L value
-The maximum number of plays and store_outmoney do not have distinct relation.
+The maximum number of plays and average earnings do not have a clear relation.
 
 
 ### changing M value
@@ -631,12 +629,12 @@ store_outmoney[i] <-mean(walk_out_money)#store_outmoney contains all of mean of 
 y=mean(walk_out_money - 200)
 }
 xm<- 51:150 # number, the casino wager limit is from 51 to 150.
-plot(x=xm,y=store_outmoney,type="l",xlab="the casino wager limit")#draw a line chart
+plot(x=xm,y=store_outmoney,type="l",xlab="The casino wager limit",ylab="Average earnings")#draw a line chart
 ```
 #### Figure analysis for changing M value
-The casino wager limit and store_outmoney do not have distinct relation.
+The casino wager limit and average earnings do not have a clear relation.
 
-## Question 3
+## Estimating the average number of plays before stopping
 
 Q3:See the stopping rule below. Explain to your audience how you used computer simulation to estimate the average number of plays before stopping. The code below will need to be modified to calculate this quantity.
 
@@ -651,10 +649,11 @@ for(j in seq_along(play_number)){
 mean(play_number)
 ```
 
-## Question 4
+## Limitations,identify simplifications and uncertainty
 
 Q4:Be sure to explain the limitations of the simulation; identify simplifications or other sources of uncertainty.
 
-Answer:limitations of the simulation:(1)When the number of gamblers rises above 10,000 times, the computer is running too long. (2) 	When Starting budget(B) is closer to Winnings threshold for stopping(W), the gamblers is easier to win money at the end of game.   
+Limitations of the simulation:(1)When the number of gamblers rises above 10,000 times, the computer is running too long. (2)	When Starting budget(B) is closer to Winnings threshold for stopping(W), the gamblers is easier to win money at the end of game. 
 Identifing simplifications:(1) Gamblers must bet until they meet stopping conditions and cannot quit the game on their own initiative. At the same time, casinos can't ignore the stopping rules and interrupt the game.
+Uncertainty: we can not ignore the subjective factors of gambler which might affect the process of game.
 
