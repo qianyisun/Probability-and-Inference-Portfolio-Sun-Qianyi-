@@ -3,32 +3,29 @@ title: "Analyzing simulation error"
 author: "Qianyi Sun"
 output:
   html_document:
-    df_print: paged
-    toc: yes
-    toc_depth: '3'
-  html_notebook:
     code_folding: hide
-    highlight: tango
-    number_sections: yes
-    theme: united
+    theme: cosmo
     toc: yes
-    toc_depth: 3
-    toc_float: yes
+    toc_depth: 5
+    toc_float: true
+editor_options: 
+  chunk_output_type: inline
 ---
 
-#  Introduction
-
-1.Explain why the concept is important
-2.Introduce key vocabulary terms
-3.Demonstrate the concept in action
+#  Introduction and explaining why the concept is important
 
 First of all, the absolute error is defined as a value which represents that the difference module between the exact value and its simulation value. When the absolute error is larger,the simulation value is more unreliable. Thus during our daily life, we should try our best to avoid the situation that the absolute error is too large to be trusted.The relative error refers to the absolute error of the measurement divided by the exact value. The relative error can be used to evaluate the difference situation between  the exact value and the simulation value in the same way. In general, the absolute value and the relative value is more approaching to zero which represents that the simulation value is closer to the exact value.
 
-By the figures based on the code simulation, we can know that when replicate number of the simulation is higher, the simulation value is closer to the exact value no matter what p's value (p denotes the true underlying probability). The replicate number of the simulation is closer to 2^15, the absolute error and the relative error is basically equel to zero. Thus in this way the absolute error and the relative error nearly can be ignored. It is believed that the specific verification process can be shown in the following code.
+By the figures based on the code simulation, we can know that when replicate number of the simulation is higher, the simulation value is closer to the exact value no matter what p value is (p denotes the true underlying probability). The replicate number of the simulation is closer to 2^15, the absolute error and the relative error is basically equel to zero. Thus in this way the absolute error and the relative error nearly can be ignored. It is believed that the specific verification process can be shown in the following code.
 
+# Key vocabulary terms
+P: The true underlying probabilty.
 
+Absolute error: The difference module between the exact value and its simulation value.
 
-# Solutions to questions
+Relative error: The absolute error of the measurement divided by the exact value
+
+# Demonstrating the concept in action
 
 ## Question 1
 
@@ -71,7 +68,6 @@ text(2.4,0.14,"p=0.10",2,col="green")
 text(2.4,0.09,"p=0.05",2,col="red")
 text(2.4,0.03,"p=0.01",2,col="black")
 ```
-
 ### Figure analysis for question 1
 When the N(log2 scale) is between 4 and 64, for the p=0.5, p=0.25,p=0.10 and p=0.05, their absolute error's values all decline very quickly. On the contrary, for p=0.01, its original absolute error's value is very small. Thus its decline trend is not that distinct.
 
@@ -162,5 +158,5 @@ text(2.3,-0.40,"p=0.50",2,col="orange")
 The value of p is higher, the relative error is small. At the same time, the five lines on the graph seemingly are parallel.
 
 
-# Conclusion
+# Conclusions
 From the four graphs, we can see that the absolute error and the relative error have a negative relation. And for log 10 output, the graphs of the absolute error and  relative error shows that their own five lines are parallel. Moreover, the log 10 output's absolute errors are all negative number. When the 10 output's N(log2 scale) are more than 256, the five relative error's value are smaller than 0 and shows a parallel trend.
