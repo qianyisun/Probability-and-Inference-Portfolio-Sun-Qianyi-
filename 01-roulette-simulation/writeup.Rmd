@@ -649,6 +649,7 @@ for(j in seq_along(play_number)){
 mean(play_number)
 ```
 
+
 ## Limitations,identify simplifications and uncertainty
 
 Q4:Be sure to explain the limitations of the simulation; identify simplifications or other sources of uncertainty.
