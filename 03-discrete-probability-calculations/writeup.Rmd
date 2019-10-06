@@ -13,7 +13,6 @@ editor_options:
 ---
 
 
-
 <center> ![](picture1.png){width=400px}  </center>
 
 
