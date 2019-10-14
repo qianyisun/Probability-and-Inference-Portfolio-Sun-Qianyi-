@@ -15,6 +15,10 @@ editor_options:
 ---
 
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = TRUE)
+```
+
 # Introduction
 
 As we all know, the median has an important meaning in doing some data analysis project. This is because the middle value of the data distribution can be used to indirectly represent data overall situation. But how to evaluate the median is very difficult.Thus now we begin to solve this problem.
@@ -208,27 +212,10 @@ plot(df4_1,mid.len4,,xlab="Density",ylab="Length",main="the length of the middle
 From the graph, we can know that with the decrease of pth quantile, the length is smaller. Thus the density is approaching to 2, the length has more precision. However, when the density is closer to 0.25, the length is less precisson.
 
 
-
 # When does the median have the tightest sampling distribution?
-```{r}
-mid.len1[41] # 45th quantile
-mid.len2[1] #5th quantile
-mid.len3[36] # 40 th quantile
-mid.len4[1] # 5th quantile
-```
-For Distribution 1, when its quantile is the range between 40 and 60, the length of median is nearly close to 0.35.
-During the range,the median has the tightest sampling distribution among all the quantiles in Distribution 1.
 
-For Distribution 2, when its quantile is approaching to 5th, the length of median is 0.064277793.
-At this time,the median has the tightest sampling distribution among all the quantiles in Distribution 2.
+For Distribution 1, when its quantile is 50th quantile, the length of median is nearly close to 0.35.At this quantile, the 50th quantile (median) has the shortest length among other quantiles. Thus the median in distribution 1 will have the tightest sampling distribution at this time. But for other distributions, by obeserving their "the length of the middle 95% of the sampling distribution" graphs, we can clearly know that their medians do not have this attribute. 
 
-For Distribution 3, when its quantile is approaching to 40th, the length of median is 0.683326.
-At this time,the median has the tightest sampling distribution among all the quantiles in the mixture distribution 3.
-
-For Distribution 4, when its quantile is approaching to 5th, the length of median is 0.02783157.
-At this time,the median has the tightest sampling distribution among all the quantiles in the mixture distribution 4.
-
-Thus, for distribution 4, when its quantile is 5th, it has least value compared to other three distributions. Thus, the conclusion can be easily obtained that the median  of the distribution 4 has the tightest sampling distribution among all the quantiles.
 
 
 # Adding additional lines for selected distribution
