@@ -214,7 +214,7 @@ From the graph, we can know that with the decrease of pth quantile, the length i
 
 # When does the median have the tightest sampling distribution?
 
-For Distribution 1, when its quantile is 50th quantile, the length of median is nearly close to 0.35.At this quantile, the 50th quantile (median) has the shortest length among other quantiles. Thus the median in distribution 1 will have the tightest sampling distribution at this time. But for other distributions, by obeserving their "the length of the middle 95% of the sampling distribution" graphs, we can clearly know that their medians do not have this attribute. 
+For Distribution 1, when its quantile is 50th quantile, the median's length of the middle 95% of the sampling distribution is nearly close to 0.35.At this quantile, the 50th quantile (median) has the highest density among other quantiles. Thus the median in distribution 1 will have the tightest sampling distribution at this time. But for other distributions, by obeserving their "the length of the middle 95% of the sampling distribution" graphs, we can clearly know that their medians do not have this attribute. 
 
 
 
