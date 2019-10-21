@@ -21,6 +21,8 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = TRUE)
 
 ```{r}
 library(tidyverse)
+library(doParallel)
+library(foreach)
 ```
 
 # Introduction
@@ -64,35 +66,28 @@ capture_median <- function(ci){
 ```
 
 
-```{r}
-capture<-NA
-for(i in 1:1000){
-  capture[i]<-Real.parameters %>% generate_data %>% est.mle %>% boot.meds.ci %>% capture_median
-}
-mean(capture)
 
-```
-
-# Change the simulation to learn more about constructing the 95% confidence interval
-
-By changing the number of capture, the results seem irregular. This is because the number of captures is so low. When we increase the number of capture, the accuracy of results is higher.
-
-
+## Final Step: Describe how you might change the simulation to learn more about the operating characteristics of your chosen method for constructing the 95% confidence interval.
 
 ```{r}
-capture.number.change<-NA
-for(j in 1:10)
-{
-  increase=i*100
-  capture<-NA
-for(i in 1:increase){
-  capture[i]<-Real.parameters %>% generate_data %>% est.mle %>% boot.meds.ci %>% capture_median
+cores_2_use <- detectCores() - 1
+cl <- makeCluster(cores_2_use)
+clusterSetRNGStream(cl, 2344)
+registerDoParallel(cl)
+
+captures <- foreach(
+    i = 1:1000
+  , .combine = c
+  , .packages = c('dplyr') # Need to indicate which packages
+) %dopar% {
+  Real.parameters %>% generate_data() %>% est.mle() %>% boot.meds.ci() %>% capture_median()
 }
-capture.number.change[j]<-mean(capture)
-}
-x<-seq(100,1000,by=100)
-plot(x=x,capture.number.change,xlab="Number of capture",ylab="95% confidence interval of coverage probability")
+stopCluster(cl)
+
+mean(captures)
 ```
+
+The answer is 0.983. It is less than 1 but is more than 0.95. Thus I think it is a reasonable answer.
 
 
 
