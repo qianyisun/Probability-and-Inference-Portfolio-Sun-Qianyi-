@@ -1,0 +1,98 @@
+---
+title: "08-coverage-probability"
+date: "10/20/2019"
+author: "Qianyi Sun"
+output:
+  html_document:
+    code_folding: hide
+    theme: cosmo
+    toc: yes
+    toc_depth: 5
+    toc_float: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+# Introduction
+As we all know, coverage probability is an important operating characteristic of methods for constructing interval estimates, particularly confidence intervals. Now I first introduce the definition of the 95% confidence interval of the median which is the middle 95% of sampling distribution of the median. For the coverage probability, it is the long run proportion of intervals that capture the population parameter of interest.Then we are going to explore how to perform a simulation to calculate the coverage probability of the 95% confidence interval of the median when computed from the maximum likelihood of estimate of FX.
+
+# Problem solutions
+
+First of all, we should generate generate a single sample from a standard normal distribution of size N=201. This is because when you use MLE, you should put the data into MLE function. Est.mle function is to calculate the MLE's mean and standard deviation of the distribution. Then we put the calculation results of the MLE's mean and standard deviation of the distribution into boot.meds.ci function. The boot.meds.ci function use the parameters from MLE method to generate median one thousand time by using MLE method.Next I preserve the 1000 values from simulation into sample.median and then I use quantile function to calculate the 95% confidence interval of the median distribution. Now I need to calculate coverage probability. You might not be familiar with coverage probability. The coverage probability is the long run proportion of intervals that capture the population parameter of interest. In order to do the calculation process of coverage probability, we put the two endpoint of the 95% confidence interval of the median distribution into capture_median which is: when left endpoint of the 95% confidence interval of the median distribution must less than 0 and right endpoint of the 95% confidence interval of the median distribution must more than 0, the value of capture_median is 1 which represents that the 95% confidence interval can capture the population parameter of interest. Otherwise, the 95% confidence interval can not capture the population parameter of interest and the value of capture_median is 0. Now we repeat one thousand time from whole procedures we just proceed. We get one thousand values which includes only 1 or 0. Finally we calculate the mean of the one thousand values of the capture_median results. The final result can be answer for the coverage probability of the 95% confidence interval of the median using MLE method.
+
+```{r}
+set.seed(4321)
+N <- 201
+pop.mean = 0
+pop.sd = 1
+Real.parameters <- c(N,mean = pop.mean, sd = pop.sd)
+
+
+generate_data <- function(parameters){
+  rnorm(parameters[1],parameters[2],parameters[3])
+}
+
+est.mle <- function(data){
+  dat.mean <- mean(data)
+  dat.sd <- sqrt(((length(data)-1)/length(data))*var(data))
+  
+  return(c(length(data),dat.mean,dat.sd)) 
+}
+
+boot.meds.ci <- function(parameters){
+  R <- 1000
+  sample.median<- NA
+  for (i in 1:R){
+    sample.median[i] <- parameters %>% generate_data()%>% median
+  }
+  quantile(sample.median,c(0.025,0.975))
+}
+
+capture_median <- function(ci){
+  1*(ci[1]<0 & 0<ci[2])
+}
+```
+
+
+```{r}
+capture<-NA
+for(i in 1:1000){
+  capture[i]<-Real.parameters %>% generate_data %>% est.mle %>% boot.meds.ci %>% capture_median
+}
+mean(capture)
+
+```
+
+# Change the simulation to learn more about constructing the 95% confidence interval
+
+By changing the number of capture, the results seem irregular. This is because the number of captures is so low. When we increase the number of capture, the accuracy of results is higher.
+
+
+
+```{r}
+capture.number.change<-NA
+for(j in 1:10)
+{
+  increase=i*100
+  capture<-NA
+for(i in 1:increase){
+  capture[i]<-Real.parameters %>% generate_data %>% est.mle %>% boot.meds.ci %>% capture_median
+}
+capture.number.change[j]<-mean(capture)
+}
+x<-seq(100,1000,by=100)
+plot(x=x,capture.number.change,xlab="Number of capture",ylab="95% confidence interval of coverage probability")
+```
+
+
+
