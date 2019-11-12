@@ -1,0 +1,169 @@
+---
+title: "09-simulation-study"
+author: "Qianyi Sun"
+output: 
+  html_document:
+    theme: united
+    #highlight: zenburn
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    #number_sections: true
+    fig_caption: true
+---
+
+# Introduction
+In this assignment, you will perform a 2×4×2 factorial simulation study to compare the coverage probability of various methods of calculating 90% confidence intervals. The three factors in the experiment are
+
+True, underlying distribution
+standard normal
+gamma(shape = 1.4, scale = 3)
+Model
+method of moments with normal
+method of moments with gamma
+kernel density estimation
+bootstrap
+Parameter of interest
+sample min (1st order statistic)
+median
+Other settings in the experiment that will not change are:
+
+Sample size, N=201
+Outside the loop estimation
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = TRUE)
+```
+
+```{r}
+library(dplyr)
+require(foreach)
+require(doParallel)
+library(tidyverse)
+```
+
+```{r}
+data <- rnorm(201)
+
+generate_data <- function(N, dist, sh, sc) {
+  if (dist == "norm") {
+    rnorm(N)
+  } else if (dist == "gamma") {
+    rgamma(N, shape = sh, scale = sc)
+  }
+}
+
+estimate.ci <- function(data, mod, par.int, R = 10, smoo = 0.3) { #Parameter of interest
+  N = length(data)
+  sum.measure <- get(par.int)
+  
+  if (mod == "MMnorm") {
+    
+    mm.mean <- mean(data)
+    mm.sd <- sd(data)
+    
+    sim.data <- array(rnorm(length(data)*R), dim = c(N, R)) #dim =c(N,R) produce N row
+    samp.dist <- apply(sim.data, 2, FUN = sum.measure) # MARGIN: row is 1 row calucation
+    return(quantile(samp.dist, c(0.05, 0.95)))
+    
+  } else if (mod == "MMgamma") {
+    
+    mm.shape <- mean(data)^2 / var(data)
+    mm.scale <- var(data) / mean(data)
+    
+    sim.data <- array(rgamma(length(data)*R, shape = mm.shape, scale = mm.scale), dim = c(N, R))
+    samp.dist <- apply(sim.data, 2, FUN = sum.measure)
+    return(quantile(samp.dist, c(0.05, 0.95),na.rm = TRUE)) #here I add na.rm=TRUE
+    
+  } else if (mod == "KDE") {
+    
+    ecdfstar <- function(t, data, smooth = smoo) {
+      outer(t, data, function(a,b){pnorm(a, b, smooth)}) %>% rowMeans
+    }
+    
+    tbl <- data.frame(
+      x = seq(min(data)-sd(data), max(data)+sd(data), by = 0.01)
+    ) 
+    
+    tbl$p <- ecdfstar(tbl$x, data, smoo) 
+    tbl <- tbl[!duplicated(tbl$p), ]
+    
+    qkde <- function(ps, tbl){
+      rows <- cut(ps, tbl$p, labels = FALSE) 
+      tbl[rows, "x"]
+    }
+    
+    U <- runif(N*R)
+    sim.data <- array(qkde(U, tbl), dim = c(N, R))
+    samp.dist <- apply(sim.data, 2, FUN = sum.measure)
+    return(quantile(samp.dist, c(0.05, 0.95),na.rm = TRUE))
+    
+  } else if (mod == "Boot") {
+    
+    samp.dist <- NA
+    for (i in 1:R) {
+      sim.data <- sample(data, N, replace = TRUE)
+      if(par.int == "median") {
+        samp.dist <- median(sim.data)
+      } else if (par.int == "min") {
+        samp.dist <- min(sim.data)
+      }
+    }
+    return(quantile(samp.dist, c(0.05, 0.95),na.rm = TRUE))
+    
+    
+    sim.data <- array(sample(data, N*R, replace = TRUE), dim = c(N, R))
+    samp.dist <- apply(sim.data, 2, FUN = sum.measure)
+    return(quantile(samp.dist, c(0.05, 0.95),na.rm = TRUE))
+  }
+}
+
+capture_par <- function(ci, true.par) {
+  1 * (ci[1] < true.par & true.par < ci[2])
+}
+```
+
+# One replicate
+
+```{r}
+N <- 201
+shape.set <- 1.4
+scale.set <- 3
+
+true.norm.med <- qnorm(0.5)
+true.norm.min <- mean(apply(array(rnorm(N*10000), dim = c(N, 10000)), 2, min))
+true.gamma.med <- qgamma(0.5, shape = shape.set, scale = scale.set)
+true.gamma.min <- mean(apply(array(rgamma(N*10000, shape = shape.set, scale = scale.set), dim = c(N, 10000)), 2, min))
+
+
+
+simsettings <- expand.grid(dist = c("norm", "gamma"), model = c("MMnorm", "MMgamma", "KDE", "Boot"), par.int = c("median", "min"), cov.prob = NA, stringsAsFactors = FALSE, KEEP.OUT.ATTRS = FALSE) 
+
+for (k in 1: nrow(simsettings)) {
+  dist1 <- simsettings[k, 1]
+  model1 <- simsettings[k, 2]
+  par.int1 <- simsettings[k, 3]
+  
+  if (dist1 == "norm"& par.int1 == "median") {
+    true.par1 = true.norm.med
+  } else if (dist1 == "norm"&par.int1=="min") {
+    true.par1 =true.norm.min
+  }else if (dist1 =="gamma" & par.int1=="median"){
+    true.part1=true.gamma.med
+  }else if (dist1=="gamma" & par.int1=="min"){
+    true.part1=true.gamma.min
+  }
+  
+cover <- NA
+for (sims in 1:10) {
+  cover[sims] <- generate_data (N, dist1,sh=shape.set,sc=scale.set)%>% estimate.ci(mod = model1, par.int = par.int1) %>% capture_par(true.par = true.par1)
+}
+simsettings[k,4] <- mean(cover)
+} 
+simsettings
+```
+
+# Conclusion
+By calculating, we can know that not all methods can work. So we can see that some answer is not correct and their coverage probability is very low.
+
