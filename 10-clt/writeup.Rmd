@@ -1,0 +1,70 @@
+---
+title: "10-clt"
+author: "Qianyi Sun"
+output: 
+  html_document:
+    theme: united
+    #highlight: zenburn
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    #number_sections: true
+    fig_caption: true
+---
+
+# Introduction
+he central limit theorem is an important computational short-cut for generating and making inference from the sampling distribution of the mean. You’ll recall that the central limit theorem short-cut relies on a number of conditions, specifically:
+
+Independent observations
+Identically distributed observations
+Mean and variance exist
+Sample size large enough for convergence
+
+```{r}
+library(magrittr)
+library(sn)
+```
+
+
+```{r}
+require(magrittr)
+require(sn)
+
+
+# Parameters that dont change
+R <- 5000
+location <- 0
+scale <- 1
+
+# Parameters that change
+N <- 5
+slant <- 10
+delta <- slant/(sqrt(1+slant^2))
+
+# Quantites to calculate/generate
+pop_mean <- location+scale*delta*(sqrt(2/pi)) 
+pop_sd <- sqrt(scale^2*(1-((2*delta^2)/pi)))
+
+# Check if we create the distribution correctly
+sample <- rsn(10000,xi=location,omega=scale,alpha=slant)
+mean(sample)
+pop_mean
+sd(sample)
+pop_sd
+
+Z <- rnorm(R)
+
+sample_dist_clt <- Z*(pop_sd/sqrt(N))+pop_mean
+random.skew <- array(rsn(R*N,xi=location,omega=scale,alpha=slant),dim = c(R,N))
+sample_dist_sim <- apply(random.skew, 1, mean)
+
+# QQ plot
+qqplot(sample_dist_sim,sample_dist_clt,asp = 1)
+abline(0,1)
+
+# Optional (Dislay the 95% CI from the clt and the sim)
+```
+
+
+
