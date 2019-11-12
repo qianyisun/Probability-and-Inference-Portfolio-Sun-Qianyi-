@@ -124,7 +124,7 @@ capture_par <- function(ci, true.par) {
 }
 ```
 
-# One replicate
+# Run function and attain results
 
 ```{r}
 N <- 201
