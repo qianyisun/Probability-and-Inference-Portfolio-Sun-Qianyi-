@@ -17,7 +17,8 @@ output:
 # Introduction
 As we know, the median is an important element when we do data analysis. This is because it shows the middle value of the  data distribution. But it is not easy to attain estimates of the median. Because the estimated are obtained from a limited sample and we do not know the specific data distribution. In this way, we begin to further study the relationship between median and data distribution.
 
-Q: Begin with the median from a sample of N=200 from the standard normal distribution. Write an R function that is the density function for the median in this sample. Note that the 100th order statistic is approximately the median, and use the order statistic formula discussed in class. Generate a plot of the function.
+## Question 1
+Begin with the median from a sample of N=200 from the standard normal distribution. Write an R function that is the density function for the median in this sample. Note that the 100th order statistic is approximately the median, and use the order statistic formula discussed in class. Generate a plot of the function.
 
 ```{r}
 N=200
@@ -31,33 +32,34 @@ dorder <- function(x,k=100,n=N){
 }
 
 
-x <- seq(-4,4,by=0.01)
+x <- seq(-1,1,by=0.01)
 plot(x,dorder(x),type="l",main="The density function for the median with a sample of N=200")
 
 ```
-When x is approaching to 0, we can find that dorder is nearly highest. However, for ot·her x's values, dorder is close to 0.
+When x is approaching to 0, we can find that dorder is nearly highest. However, for other x's values, dorder is close to 0.
 
-Q: Write an R function that is the probability function for the median in this sample. Use the order statistic formula discussed in class. Generate a plot of the function.
+## Question 2
+Write an R function that is the probability function for the median in this sample. Use the order statistic formula discussed in class. Generate a plot of the function.
 
 ```{r}
 porder <- Fk <- function(x,k=100,n=N){
   pbinom(k-1, n, pnorm(x,0,1), lower.tail = FALSE) #calculate right side
 }
 pbinom(100-1,200,pnorm(0,0,1),lower.tail = FALSE)
-x<-seq(-3,3,by=0.01)
+x<-seq(-1,1,by=0.01)
 plot(x,porder(x),type="l",main="The probability function for the median")
 
 
 ```
+We can observe that when poder(x) is close to 0.0, there has a maximum slope.The probability of median being 0 is the probability function for the median in this sample
 
-By observing the area of porder, its area is close to the value of the probability function for the median in this sample. And when x <0, values of porder are nearly 0.
-
-Q: Write an R function that is the quantile function for the median in this sample. (You have several options for how to write this function.) Generate a plot of the function.
+## Question 3
+Write an R function that is the quantile function for the median in this sample. (You have several options for how to write this function.) Generate a plot of the function.
 
 ```{r}
 g <- function(x, pf, p) pf(x) - p
 qorder <- function(p) {
-  output <- p
+  output <- p #here just apply same space into out
   for(i in seq_along(p)){
     output[i] <- uniroot(g, c(-200, 200), pf = porder, p = p[i])$root
   }
@@ -65,16 +67,15 @@ qorder <- function(p) {
 }
 
 p <- seq(0.01, 0.99, by = 0.01)
-plot(p, qorder(p), type = "l",main="the quantile function for the median")
+plot(p, qorder(p), type = "l",main="The quantile function for the median")
 
 
 ```
+This is  quantile function for the median in this sample.When p is equal to 0.5, we can find that qorder(p) is nearly close or equal to 0.0.
 
 
-
-
-
-Q: Simulate the sampling distribution for the median as you did in the previous deliverable. Create a plot of the empirical CDF (ECDF). Overlay the plot of the ECDF with a plot of the CDF.
+## Question 4
+Simulate the sampling distribution for the median as you did in the previous deliverable. Create a plot of the empirical CDF (ECDF). Overlay the plot of the ECDF with a plot of the CDF.
 CDF is PDF’definite integral
 
 ```{r warning=FALSE}
@@ -94,17 +95,17 @@ plot(ecdf(medians), add = TRUE, col = "blue")
 ```
 From the graph above, we can find that the ECDF and CDF curve are nearly overlapped.It means that the ECDF curve can be regarded as CDF curve and the simulation result is successful.
 
-
-Q: Using the simulated sampling distribution from the previous question, create a histogram (on the density scale). Overlay the histogram with a plot of the density function.
+## Question 5
+Using the simulated sampling distribution from the previous question, create a histogram (on the density scale). Overlay the histogram with a plot of the density function.
 
 ```{r warning=FALSE}
 hist(medians, freq = FALSE,,main="Overlay the histogram with a plot of the density function")
 curve(dorder(x), add = TRUE, col = "pink")  # density just like the slope within the cdf
 ```
-From the graph, the density curve is a smooth curve and its area is 1. The density curve shows that the histogram has a clear normal distribution.
+From the graph, the density curve is a smooth curve and its area is 1. The density curve shows that the sampling distribution fits theoretical one very well. 
 
-
-Q: One very common way to compare a random sample to a theoretical candidate distribution is the QQ plot. It is created by ploting quantiles of the theoretical distribution on the x-axis and empirical quantiles from the sample on the y-axis.
+## Question 6
+ One very common way to compare a random sample to a theoretical candidate distribution is the QQ plot. It is created by ploting quantiles of the theoretical distribution on the x-axis and empirical quantiles from the sample on the y-axis.
 
 If sample and theoretical quantiles come from the same distribution, then the plotted points will fall along the line y=x, approximately. Here are two examples when the sample and theoretical quantiles came from the same distribution.
 
@@ -137,6 +138,7 @@ plot(x,y, asp = 1, xlab = "Theoretical quantile", ylab = "Sample quantile")
 
 abline(0,1)
 ```
+From the two graphs abovem we can clear know that the theoretical quantiles and sample quantile has great linear relationship and their slope is basically equal to 1. Thus it shows that the sampling distribution of medians is aligned with the theoritical results.
 
 Here is an example when the sample distribution does not match with the theoretical distribution. The sample distribution is t3 where as the theoretical distribution is N(0,1). Notice the deviation from y=x.
 
@@ -155,6 +157,7 @@ plot(x,y, asp = 1, xlab = "Theoretical quantile", ylab = "Sample quantile")
 abline(0,1)
 
 ```
+
 For the assigment, generate a QQ plot for the simulated data of the median relative to the known sampling distribution of the median.
 
 Does the simulated data agree with the theoretical sampling distribution?
@@ -176,21 +179,55 @@ abline(0,1)
 ```
 Answer:As the picture shows, the simulated data is nearly equal to the theoretical sampling distribution. Thus it does agree with the theoretical sampling distribution.
 
-
-Q: Modify the dorder, porder, and qorder functions so that the functions take a new parameter k (for the kt**h order statistic) so that the functions will work for any order statistic and not just the median.
+## Question 7
+ Modify the dorder, porder, and qorder functions so that the functions take a new parameter k (for the kt**h order statistic) so that the functions will work for any order statistic and not just the median.
 
 ```{r}
-N=200
-random_sample <- medians
-q_candidate <- qorder
-x <- q_candidate((1:N)/N)
-y <- quantile(random_sample, probs = (1:N)/N)
+dorder <- function(x, k){
+  k*
+    choose(200, k)*
+    pnorm(x,0,1)^(k-1)*
+    (1-pnorm(x,0,1))^(200-k)*
+    dnorm(x,0,1)
+}
 
-plot(x,y,xlim=c(-0.3,0.3),ylim=c(-0.3,0.3),  xlab = "Theoretical quantile", ylab = "Sample quantile")
-abline(0,1)
+porder <- function(x, k){
+  pbinom(k-1, 200, pnorm(x,0,1), lower.tail = FALSE)
+}
+
+qorder <- function(p, k){
+  out <- p
+  for(i in seq_along(p)){
+    out[i] <- uniroot(function(x){porder(x, k) - p[i]}, c(-100,100))$root
+  }
+  out
+}
 
 ```
-Q: Modify the dorder, porder, and qorder functions so that the functions take new parameters dist and ... so that the functions will work for any continuous distribution that has d and p functions defined in R.
+I have changed the dorder, porder, and qorder functions so that the functions take a new parameter k.
+
+## Question 8
+Generate the QQ plot for simulated data from the sampling distribution of the sample max and the theoretical largest order statistic distribution.
+```{r}
+
+N <- 200
+M <- 5000
+out <- array(rnorm(M*N), c(M,N)) # produce M rows N columns
+maxs <- apply(out,1,max) # out is matrix, 1 shows rows, max is the functions to be applied
+
+p <- ppoints(200) # shows from 0.0025 to 1. shows total 200 points
+x <- qorder(p, 200)
+y <- quantile(maxs, probs = p)
+
+plot(x,y, asp = 1, xlab = "Theoretical quantile", ylab = "Sample quantile") #y axis and y axis values's ratio
+abline(0,1)
+
+
+```
+From graph above,we can know that sampling distribution of maximum also fits theoretical distribution very well.
+
+## Question 9
+Modify the dorder, porder, and qorder functions so that the functions take new parameters dist and ... so that the functions will work for any continuous distribution that has d and p functions defined in R.
 ```{r}
 dorder <- function(x, k, n, dist = "norm", ...){
   
@@ -221,25 +258,11 @@ qorder <- function(p, k, n, dist = "norm", ...){
 }
 ```
 
-Q: Generate the QQ plot for simulated data from the sampling distribution of the sample max and the theoretical largest order statistic distribution.
-```{r}
 
-N <- 200
-M <- 5000
-out <- array(rnorm(M*N), c(M,N))
-maxs <- apply(out,1,max)
+## Question 10
+Use the newly modified functions to plot the probability and density functions for the sample min (N=200).
 
-p <- ppoints(200)
-x <- qorder(p, 200, 200)
-y <- quantile(maxs, probs = p)
-
-plot(x,y, asp = 1, xlab = "Theoretical quantile", ylab = "Sample quantile")
-abline(0,1)
-
-
-```
-
-Q: Use the newly modified functions to plot the probability and density functions for the sample min (N=200).
+From the graph below, we can see that there is a rapid increasing in probability when the sample min is approaching -2.5.
 ```{r}
 
 par(mfrow = c(2,1))
@@ -247,8 +270,9 @@ curve(porder(x, 1, 200), -5,0, ylab = "Probability", xlab = "min", lwd = 3)
 curve(dorder(x, 1, 200), -5,0, ylab = "Density", xlab = "min", lwd = 3)
 
 ```
+When the sample min is approaching -2.5, the density is close to the highest value.
 
-
+In a word, the sample distributions and theoretical models are fitted well very by analyzing the graphs above.
 
 
 
