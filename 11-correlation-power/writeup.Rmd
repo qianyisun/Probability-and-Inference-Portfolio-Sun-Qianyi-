@@ -1,0 +1,66 @@
+---
+title: "11-mvn"
+author: "Qianyi Sun"
+output:
+  html_document:
+    code_folding: hide
+    theme: cosmo
+    toc: yes
+    toc_depth: 5
+    toc_float: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Power and sample size calculations correlational studies
+In this report, I will perform a power and sample size calculation for a collaborator who is submitting a grant application to fund a study to show that two measurements are highly correlated. Reviewers of the grant want to fund studies that have a high likelihood of success, which in this setting is conclusively demonstrating that the correlation between A and B is greater than 0.8.
+
+Power is the probability that the study will end in success when the true underlying correlation is, in fact, greater that 0.8.In this report, we just let the sample size be 25, 50, 75, and 100. Let the population correlation range from 0.8 to 0.95.
+
+The code below provides the power calculation for a single combination of N and population correlation.
+```{r}
+set.seed(20394)
+suppressPackageStartupMessages(require(mvtnorm))
+null_correlation <- 0.8
+R <- 1000
+mu <- c(0,0)
+power <- matrix(NA, nrow = 4, ncol = 16) # create maxtrix
+N<-c(25,50,75,100)
+for (i in 1:4) {
+  for (j in 1:16) {
+    rho = 0.79 + 0.01 * j
+    sigma <- array(c(1,rho,rho,1), c(2,2))
+    detect <- rep(NA, R)
+    for(m in 1:R){
+      data <- rmvnorm(N[i], mean = mu, sigma = sigma)
+      results <- cor.test(x = data[,1], y = data[,2], alternative = "greater")
+      detect[m] <- results$conf.int[1] > null_correlation #null_correlation is to test confidence interval
+    }
+    power[i,j] <- mean(detect)
+  }
+}
+```
+
+
+
+```{r}
+
+
+plot(x=seq(0.80,0.95,0.01),y=power[1,], type = "b", pch = 20,xlim=c(0.8,0.96),col = "black",ylab="Power",xlab="Correlation")
+lines(x=seq(0.80,0.95,0.01),y=power[2,], type = "b", pch = 20, col = "green")
+lines(x=seq(0.80,0.95,0.01),y=power[3,], type = "b", pch = 20, col = "red")
+lines(x=seq(0.80,0.95,0.01),y=power[4,], type = "b", pch = 20, col = "brown")
+text(0.88,0.30,"25",1,col="black")
+text(0.88,0.50,"50",2,col="green")
+text(0.88,0.75,"75",1,col="red")
+text(0.88,0.88,"N=100",1,col="brown")
+
+
+```
+
+
+# Conclusion by observing the graph above 
+By observing the graph, we can see that with the increase of N, the probability that the study will end in success is higher when they have same true underlying correlation. Eventually, the power will be equal to 1 with the increase of correlation.
+
+
+
