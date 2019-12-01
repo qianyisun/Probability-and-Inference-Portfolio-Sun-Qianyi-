@@ -1,0 +1,168 @@
+---
+title: "09-method-comparison"
+output:
+  html_document:
+    code_folding: hide
+    theme: cosmo
+    toc: yes
+    toc_depth: 5
+    toc_float: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Introduction
+In this assignment, you will perform a 2×4×2 factorial simulation study to compare the coverage probability of various<br> methods of calculating 90% confidence intervals. The three factors in the experiment are:
+
+1.True, underlying distribution:<br>
+standard normal<br>
+gamma(shape = 1.4, scale = 3)<br>
+2.Model:<br>
+method of moments with normal<br>
+method of moments with gamma<br>
+kernel density estimation<br>
+bootstrap<br>
+3.Parameter of interest<br>
+sample min (1st order statistic)<br>
+median<br>
+
+Other settings in the experiment that will not change are:<br>
+Sample size, N=201<br>
+Outside the loop estimation<br>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = TRUE)
+```
+
+```{r}
+library(dplyr)
+require(foreach)
+require(doParallel)
+library(tidyverse)
+```
+
+```{r}
+generate_data<-function(N,dist,sh=1.4,sc=3){
+  if (dist=="norm"){
+    rnorm(N)+4
+  }else if(dist=='gamma'){
+    rgamma(N,shape=sh,scale=sc)
+  }
+}
+
+
+
+estimate.ci<-function(data,mod,par.int,R=100,smoo=0.3){
+  N<-length(data)
+  sum.measure<-get(par.int)
+  if (mod=="MMnorm"){ 
+    mm.mean<-mean(data)
+    mm.sd<-sd(data)
+    
+    
+    sim.data<-array(rnorm(N*R,mm.mean,mm.sd),dim=c(N,R))  
+    
+  }
+  else  if(mod=="MMgamma"){
+    mm.shape<-mean(data)^2/var(data)
+    mm.scale<-var(data)/mean(data)
+    
+    sim.data<-array(rgamma(N*R,shape=mm.shape,scale=mm.scale),dim=c(N,R)) 
+    
+    
+  }
+  else if (mod=="KDE"){
+    
+    ecdfstar <- function(t, data, smooth=smoo){
+      outer(t, data, function(a,b){ pnorm(a, b, smooth)}) %>% rowMeans
+    }
+    
+    
+    tbl <- data.frame(
+      x = seq(min(data)-sd(data),max(data)+sd(data),by = 0.01)
+    )
+    
+    
+    tbl$p <- ecdfstar(tbl$x, data) 
+    
+    tbl <- tbl[!duplicated(tbl$p),]
+    
+    qkde <- function(ps, tbl){
+      rows <- cut(ps, tbl$p, labels = FALSE)
+      tbl[rows, "x"]
+    }
+
+    U<-runif(N*R) 
+    sim.data<-array(qkde(U,tbl),dim=c(N,R)) 
+    
+    
+  }
+  else if(mod=="Boot"){
+    sim.data<-array(sample(data,N*R,replace = T),dim=c(N,R))
+    
+  }
+  samp.dist<-apply(sim.data,2,sum.measure)
+  return(samp.dist)
+}
+
+construct_ci<-function(samp.dist){
+  return(quantile(samp.dist,c(.05,.95),na.rm=T))
+}
+
+capture_par<-function(ci,true.par){
+  1*(ci[1]<true.par&true.par<ci[2])
+}
+```
+
+
+
+# Run function and attain results
+
+```{r}
+N<-201
+true.norm.med<-qnorm(.5)+4.1
+true.norm.min<-mean(apply(array(rnorm(N*10000),dim=c(N,10000)),2,min))+4.1
+true.gamma.med<-qgamma(.5,shape=1.4,scale=3)
+true.gamma.min<-mean(apply(array(rgamma(N*10000,shape=1.4,scale=3),dim=c(N,10000)),2,min))
+
+
+settings<-expand.grid(dist=c("norm","gamma"),model=c('MMnorm','MMgamma','KDE','Boot'),par.int=c('min','median'),stringsAsFactors = F)
+settings<-settings %>% 
+  mutate(true.par=case_when(
+    dist=='norm'&par.int=='min'~true.norm.min,
+    dist=='norm'&par.int=='median'~true.norm.med,
+    dist=='gamma'&par.int=='min'~true.gamma.min,
+    dist=='gamma'&par.int=='median'~true.gamma.med
+  )) %>% 
+  mutate(id=row_number()) %>% 
+  select(id,everything())
+
+
+
+cores_2_use <- detectCores() - 1
+print('cores_2_use: ',cores_2_use)
+cl <- makeCluster(cores_2_use)
+clusterSetRNGStream(cl, 2344)
+registerDoParallel(cl)
+
+for (j in 1:nrow(settings)){
+  captures <- foreach(
+    i = 1:20
+    , .combine = c
+    , .packages = c('dplyr') 
+  ) %dopar% {
+    generate_data(N,settings$dist[j]) %>% estimate.ci(mod=settings$model[j],par.int=settings$par.int[j],R=5000 )%>%construct_ci() %>% capture_par(settings$true.par[j])
+  }
+  settings$cap[j]<-mean(captures)
+}
+
+stopCluster(cl)
+```
+```{r}
+settings
+```
+
+
+# Conclusion
+By calculating, we can know that not all methods can work. So we can see that some answers are not perfectly correct and their coverage probability is very low.
+
