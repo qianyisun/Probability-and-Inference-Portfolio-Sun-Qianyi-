@@ -31,7 +31,7 @@ library(sn)
 
 
 # Code flow and graphs
-```{r fig1, fig.height = 5, fig.width = 5}
+```{r fig1, fig.height = 10, fig.width = 10}
 
 R <- 5000
 location <- 0
