@@ -121,7 +121,7 @@ Answer just like this shows.
 ```{r}
 #prevalence <- sequence(0.001, 0.1, length = 50)
 prevalence<-seq(0.001,0.1,0.002)
-ppv <- (0.05+0.8*prevalence)/(0.85*prevalence)
+ppv <- (0.85*prevalence)/(0.05+0.8*prevalence)
 plot(prevalence, ppv, xlab = "Prevalence", ylab = "PPV")
 ```
 
