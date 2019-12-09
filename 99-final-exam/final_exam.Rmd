@@ -112,7 +112,7 @@ Answer just like this shows.
 
 **B**. Calculate the **negative** predictive value of the test, P(D-|T-).
 ```{r}
-0.998 #Answer
+0.998 #Answer(keep Three decimal places )
 ```
 
 
