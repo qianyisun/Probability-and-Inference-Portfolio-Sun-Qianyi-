@@ -214,12 +214,12 @@ title(xlab = "Femor Length", ylab = "P( Male | femor length)")
 
 Answer:
 ```{r}
-femor_length <- 25:50
+x <- 25:50
 
-p4<-pnorm(50,40,3.4)-pnorm(25,40,3.4)
+p4<-pnorm(x,40,3.4)-pnorm(25,40,3.4)
 p2<-dnorm(37,40,3.4)
 p<-p2/p4
-p
+plot(x,p)
 ```
 
 
