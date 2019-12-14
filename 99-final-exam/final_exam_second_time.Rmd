@@ -1,0 +1,181 @@
+---
+title: "Final Exam 2"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+`???` <- 5 # This is just so the document compiles.
+require(magrittr)
+require(dplyr)
+```
+
+# Instructions
+
+1. Only complete the sections for which you want a better score.  (Complete all questions within a section.)
+2. After completing the exam:
+   + Delete any sections that you did not complete.
+   + Save the exam as final-exam-2.rmd and final-exam-2.html in the 99-final-exam folder of your Probability and Inference Portfolio repo.
+   + Push your repo.
+
+# 1. Simulation
+
+The Monte Hall problem is a classic game show.  Contestants on the show where shown three doors.  Behind one randomly selected door was a sportscar; behind the other doors were goats.
+
+At the start of the game, contestants would select a door, say door A.  Then, the host would open either door B or C to reveal a goat.  At that point in the game, the host would ask the contestant if she would like to change her door selection.  Once a contestant decided to stay or change, the host would open the choosen door to reveal the game prize, either a goat or a car.
+
+In this problem, consider a **modified** version of the Monte Hall problem in which the number of doors is **variable**.  Rather than 3 doors, consider a game with 4 or 5 or 50 doors.  In the modified version of the game, a contestant would select an initial door, say door A.  Then, the host would open **one** of the remaining doors to reveal a goat.  At that point in the game, the host would ask the contestant if she would like to change her door selection.  Once a contestant decided to stay or change, the host would open the choosen door to reveal the game prize, either a goat or a car.
+
+Consider two strategies:
+  
+  1. Always stay with the first door selected.
+  2. Always switch to the unopened door.
+
+**C.** The function `game` below plays a single game of Monte Hall.  The function returns a vector of length two, the first element is the prize under strategy 1 and the second element is the prize under strategy 2.  The function has a single input parameter, N, which is the number of doors in the game.
+
+Use the `game` function to estimate the probability that both strategies result in a goat. Let **N=4**.
+
+**HINT:** Create an Rx2 array, and store the results of each game as a row in the array.  Create a cross tabulation of the winnings from strategy 1 and strategy 2.
+
+```{r}
+game <- function(N){
+  if(N<3) stop("Must have at least 3 doors")
+  prize <- sample(c(rep("goat",N-1),"car"), N)
+  guess <- sample(1:N,1)
+  game <- data.frame(door = 1:N, prize = prize, stringsAsFactors = FALSE) %>% 
+    mutate(first_guess = case_when(
+      door == guess ~ 1
+      , TRUE ~ 0
+    )) %>% 
+    mutate(potential_reveal = case_when(
+        first_guess == 1 ~ 0
+      , prize == "car" ~ 0
+      , TRUE ~ 1
+    )) %>% 
+    mutate(reveal = 1*(rank(potential_reveal, ties.method = "random") == 3)) %>% 
+    mutate(potential_switch = case_when(
+      first_guess == 1 ~ 0
+      , reveal == 1 ~ 0
+      , TRUE ~ 1
+    )) %>% 
+    mutate(switch = 1*(rank(potential_switch, ties.method = "random") == 3))
+  c(game$prize[game$first_guess == 1], game$prize[game$switch == 1])
+}
+```
+
+
+```{r}
+R=5000
+strategy = array(NA, c(2, R))
+
+set.seed(1)
+R<-5000
+strategy_1<-rep(NA,R)
+strategy_2<-rep(NA,R)
+for (i in 1:R){
+  out<-game(N=4)
+  strategy[1,i]<-out[1]
+  strategy[2,i]<-out[2]
+}
+mean(strategy[1,]=='goat'&strategy[2,]=='goat')
+```
+
+
+
+**B**. Continuing from part **C**, what is the probability that at least one of the strategies results in winning a car?
+
+**HINT:** Use the cross tabulation from the previous part to calculate this probability.
+
+```{r}
+mean(strategy[1,]=='car'|strategy[2,]=='car')
+```
+
+
+**A**. Communicate the precision of your simulated probability in part **B** by calculating a **99\%** confidence interval.
+
+**HINT:** Use the CLT short cut.
+
+```{r}
+result<-prop.test(sum(strategy[1,]=='car'|strategy[2,]=='car'),R,conf.level = .99)
+result
+```
+When I use the CLT short cut to simulate my result, we can find that the 99% Ci is (0.6048914,0.6403813), the sumulated probability is 0.6228 is Ci interval and the ci interval difference is only 0.0355, which is a very tight result. Thus I believe that the simulated probability I did is high precision.
+
+
+
+
+
+
+
+# 4. Continuous Distributions
+
+Let X be distributed as a mixture normals.  The `r`, `p`, and `d` functions are below.  (This is our old friend `f3` from deliverable 5.)
+
+```{r, echo = TRUE}
+rf3 <- function(N){
+  G <- sample(0:2, N, replace = TRUE, prob = c(5,3,2))
+  (G==0)*rnorm(N) + (G==1)*rnorm(N,4) + (G==2)*rnorm(N,-4,2)
+}
+
+pf3 <- function(x){
+  .5*pnorm(x) + .3*pnorm(x,4) + .2*pnorm(x,-4,2)
+}
+
+df3 <- function(x){
+  .5*dnorm(x) + .3*dnorm(x,4) + .2*dnorm(x,-4,2)
+}
+```
+
+Let Y be distirbuted as another mixture of normals.  The `r`, `p`, and `d` functions are below.  (This is a slightly different distribution.)
+
+```{r, echo = TRUE}
+rf4 <- function(N){
+  G <- sample(0:2, N, replace = TRUE, prob = c(2,3,5))
+  (G==0)*rnorm(N) + (G==1)*rnorm(N,4) + (G==2)*rnorm(N,-4,2)
+}
+
+pf4 <- function(x){
+  .2*pnorm(x) + .3*pnorm(x,4) + .5*pnorm(x,-4,2)
+}
+
+df4 <- function(x){
+  .2*dnorm(x) + .3*dnorm(x,4) + .5*dnorm(x,-4,2)
+}
+```
+
+**C.** What is the .9 quantile of X?
+
+```{r}
+R=5000
+
+quantile(rf3(R),0.9)
+
+```
+
+**B.** Suppose that X is the distribution of a biomarker when a patient is healthy.  Suppose Y is the distribution of the same biomarker when a patient has a genetic condition.  
+
+Calculate P(genetic condition is present | biomarker = 0) under the assumption that P(genetic condition) = 0.1.
+
+```{r}
+
+p<-df4(0)*0.1/(df3(0)*0.9+df4(0)*0.1)
+p
+```
+
+
+**A.**  Generate a plot of P(genetic condition is present | biomarker = B).  Let B length range from -6 to 6.
+
+
+```{r}
+B <- seq(-6, 6, by = .25)
+prob_genetic_condition <- df4(B)*0.1/(df3(B)*0.9+df4(B)*0.1)
+plot.new()
+plot.window(xlim = c(-6,6), ylim = c(0,1))
+lines(B, prob_genetic_condition)
+axis(1)
+axis(2)
+box()
+title(xlab = "Biomarker value", ylab = "P( genetic condition | biomarker )")
+```
+
+
+
